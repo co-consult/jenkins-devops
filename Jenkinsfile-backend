@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        pollSCM('10 17 * * *')
+        pollSCM('20 17 * * *')
     }
 
     environment {
@@ -12,12 +12,13 @@ pipeline {
         REGISTRY_CREDENTIAL = 'dockerhublogin'
         DEPLOYMENT_FILE = 'backend-deployment.yaml'
     }
-        when {
-        branch 'master'
-    }
+        
 
     stages {
         stage('Checkout Repository') {
+            when {
+                 branch 'master'
+              }
             steps {
                 script {
                     checkout([ 
@@ -33,6 +34,9 @@ pipeline {
         }
 
         stage('Check User') {
+                        when {
+                 branch 'master'
+              }
             steps {
                 script {
                     sh 'whoami'
@@ -42,6 +46,9 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+                        when {
+                 branch 'master'
+              }
             steps {
                 script {
                     backendImage = docker.build("${IMAGE_NAME}", "-f Dockerfile .")
@@ -50,6 +57,9 @@ pipeline {
         }
 
         stage('Push Image to DockerHub') {
+                        when {
+                 branch 'master'
+              }
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', REGISTRY_CREDENTIAL) {
@@ -60,6 +70,9 @@ pipeline {
         }
 
         stage('Start Minikube') {
+                        when {
+                 branch 'master'
+              }
             steps {
                 script {
                     sh '''
@@ -75,7 +88,11 @@ pipeline {
         }
 
         stage('Deploy to Minikube') {
+                        when {
+                 branch 'master'
+              }
             steps {
+
                 script {
                     checkout([$class: 'GitSCM',
                     branches: [[name: '*/DEVOPS-4']],

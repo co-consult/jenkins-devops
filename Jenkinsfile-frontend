@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        pollSCM('10 17 * * *')
+        pollSCM('20 17 * * *')
     }
     environment {
         REPO_URL = 'https://github.com/co-consult/coAudit-frontend.git'
@@ -11,11 +11,12 @@ pipeline {
         REGISTRY_CREDENTIAL = 'dockerhublogin'
         DEPLOYMENT_FILE = 'frontend-deployment.yaml'
     }
-    when {
-        branch 'master'
-    }
+
     stages {
         stage('Checkout Repository') {
+                when {
+        branch 'master'
+    }
             steps {
                 script {
                     checkout([
@@ -31,6 +32,9 @@ pipeline {
         }
 
         stage('Check User') {
+                when {
+        branch 'master'
+    }
             steps {
                 script {
                     sh 'whoami'
@@ -40,6 +44,9 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+                when {
+        branch 'master'
+    }
             steps {
                 script {
                     frontendImage = docker.build("${IMAGE_NAME}", "-f Dockerfile .")
@@ -48,6 +55,9 @@ pipeline {
         }
 
         stage('Push Image to DockerHub') {
+                when {
+        branch 'master'
+    }
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', REGISTRY_CREDENTIAL) {
@@ -58,6 +68,9 @@ pipeline {
         }
 
         stage('Start Minikube') {
+                when {
+        branch 'master'
+    }
             steps {
                 script {
                     sh '''
@@ -73,6 +86,9 @@ pipeline {
         }
 
         stage('Deploy to Minikube') {
+                when {
+        branch 'master'
+    }
             steps {
                 script {
                     checkout([$class: 'GitSCM',
