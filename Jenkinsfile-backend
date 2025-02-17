@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+    triggers {
+        pollSCM('0 17 * * *')
+    }
+
+    environment {
+        REPO_URL = 'https://github.com/co-consult/coAudit-backend.git'
+        GIT_CREDENTIALS_ID = 'git_secret'
+        DOCKERHUB_USERNAME = 'ousshen'
+        IMAGE_NAME = 'ousshen/frontback:back-latest'
+        REGISTRY_CREDENTIAL = 'dockerhublogin'
+        DEPLOYMENT_FILE = 'backend-deployment.yaml'
+    }
+
+    stages {
+        stage('Checkout Repository') {
+            steps {
+                script {
+                    checkout([ 
+                        $class: 'GitSCM', 
+                        branches: [[name: '*/main']], 
+                        userRemoteConfigs: [[
+                            url: REPO_URL, 
+                            credentialsId: GIT_CREDENTIALS_ID 
+                        ]] 
+                    ])
+                }
+            }
+        }
+
+        stage('Check User') {
+            steps {
+                script {
+                    sh 'whoami'
+                    sh 'id'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    backendImage = docker.build("${IMAGE_NAME}", "-f Dockerfile .")
+                }
+            }
+        }
+
+        stage('Push Image to DockerHub') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', REGISTRY_CREDENTIAL) {
+                        backendImage.push('latest')
+                    }
+                }
+            }
+        }
+
+        stage('Start Minikube') {
+            steps {
+                script {
+                    sh '''
+                        if ! minikube status | grep -q "Running"; then
+                            echo "Minikube is not running. Starting Minikube..."
+                            minikube start
+                        else
+                            echo "Minikube is already running."
+                        fi
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Minikube') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                    branches: [[name: '*/DEVOPS-4']],
+                    extensions: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'git_secret', 
+                        url: 'https://github.com/co-consult/jenkins-devops.git'
+                    ]]
+                ])
+                    sh "ls -l ${WORKSPACE}"
+                    sh "minikube kubectl -- apply -f ${DEPLOYMENT_FILE}"
+                }
+            }
+        }
+    }
+}
