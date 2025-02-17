@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        pollSCM('0 17 * * *')
+        pollSCM('10 17 * * *')
     }
     environment {
         REPO_URL = 'https://github.com/co-consult/coAudit-frontend.git'
@@ -11,7 +11,9 @@ pipeline {
         REGISTRY_CREDENTIAL = 'dockerhublogin'
         DEPLOYMENT_FILE = 'frontend-deployment.yaml'
     }
-
+    when {
+        branch 'master'
+    }
     stages {
         stage('Checkout Repository') {
             steps {

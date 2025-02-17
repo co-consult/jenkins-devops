@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        pollSCM('0 17 * * *')
+        pollSCM('10 17 * * *')
     }
 
     environment {
@@ -11,6 +11,9 @@ pipeline {
         IMAGE_NAME = 'ousshen/frontback:back-latest'
         REGISTRY_CREDENTIAL = 'dockerhublogin'
         DEPLOYMENT_FILE = 'backend-deployment.yaml'
+    }
+        when {
+        branch 'master'
     }
 
     stages {
