@@ -18,7 +18,7 @@ pipeline {
                 script {
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: '*/main']],
+                        branches: [[name: '*/master']],
                         userRemoteConfigs: [[
                             url: REPO_URL,
                             credentialsId: GIT_CREDENTIALS_ID
@@ -74,7 +74,7 @@ pipeline {
             steps {
                 script {
                     checkout([$class: 'GitSCM',
-                    branches: [[name: '*/master']],
+                    branches: [[name: '*/DEVOPS-4']],
                     extensions: [],
                     userRemoteConfigs: [[
                         credentialsId: 'git_secret', 
