@@ -1,24 +1,19 @@
 pipeline {
     agent any
     triggers {
-        pollSCM('20 17 * * *')
+        pollSCM('0 8 * * *')
     }
 
     environment {
         REPO_URL = 'https://github.com/co-consult/coAudit-backend.git'
         GIT_CREDENTIALS_ID = 'git_secret'
-        DOCKERHUB_USERNAME = 'ousshen'
-        IMAGE_NAME = 'ousshen/frontback:back-latest'
-        REGISTRY_CREDENTIAL = 'dockerhublogin'
+        IMAGE_NAME = 'backfront:backend-latest'
         DEPLOYMENT_FILE = 'backend-deployment.yaml'
+        DATABASE_FILE = 'database-deployment.yaml'
     }
         
-
     stages {
         stage('Checkout Repository') {
-            when {
-                 branch 'master'
-              }
             steps {
                 script {
                     checkout([ 
@@ -33,76 +28,27 @@ pipeline {
             }
         }
 
-        stage('Check User') {
-                        when {
-                 branch 'master'
-              }
-            steps {
-                script {
-                    sh 'whoami'
-                    sh 'id'
-                }
-            }
-        }
-
         stage('Build Docker Image') {
-                        when {
-                 branch 'master'
-              }
             steps {
                 script {
-                    backendImage = docker.build("${IMAGE_NAME}", "-f Dockerfile .")
-                }
-            }
-        }
-
-        stage('Push Image to DockerHub') {
-                        when {
-                 branch 'master'
-              }
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', REGISTRY_CREDENTIAL) {
-                        backendImage.push('latest')
-                    }
-                }
-            }
-        }
-
-        stage('Start Minikube') {
-                        when {
-                 branch 'master'
-              }
-            steps {
-                script {
-                    sh '''
-                        if ! minikube status | grep -q "Running"; then
-                            echo "Minikube is not running. Starting Minikube..."
-                            minikube start
-                        else
-                            echo "Minikube is already running."
-                        fi
-                    '''
+                    docker.build("${IMAGE_NAME}", "-f Dockerfile .")
                 }
             }
         }
 
         stage('Deploy to Minikube') {
-                        when {
-                 branch 'master'
-              }
             steps {
-
                 script {
                     checkout([$class: 'GitSCM',
-                    branches: [[name: '*/DEVOPS-4']],
-                    extensions: [],
-                    userRemoteConfigs: [[
-                        credentialsId: 'git_secret', 
-                        url: 'https://github.com/co-consult/jenkins-devops.git'
-                    ]]
-                ])
+                        branches: [[name: '*/DEVOPS-4']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'git_secret', 
+                            url: 'https://github.com/co-consult/jenkins-devops.git'
+                        ]]
+                    ])
                     sh "ls -l ${WORKSPACE}"
+                    sh "minikube kubectl -- apply -f ${DATABASE_FILE}"
                     sh "minikube kubectl -- apply -f ${DEPLOYMENT_FILE}"
                 }
             }

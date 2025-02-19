@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ousshen/frontend:latest
+        image: frontback:front-latest
         ports:
         - containerPort: 8080
 ---
@@ -25,10 +25,11 @@ kind: Service
 metadata:
   name: frontend-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: frontend
   ports:
   - protocol: TCP
     port: 80
     targetPort: 8080
+    nodePort: 30080 

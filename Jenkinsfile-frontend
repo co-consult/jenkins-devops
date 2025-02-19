@@ -1,104 +1,50 @@
 pipeline {
     agent any
     triggers {
-        pollSCM('20 17 * * *')
+        pollSCM('0 8 * * *')
     }
     environment {
         REPO_URL = 'https://github.com/co-consult/coAudit-frontend.git'
         GIT_CREDENTIALS_ID = 'git_secret'
-        DOCKERHUB_USERNAME = 'ousshen'
-        IMAGE_NAME = 'ousshen/frontback:front-latest'
-        REGISTRY_CREDENTIAL = 'dockerhublogin'
+        IMAGE_NAME = 'backfront:frontend-latest'
         DEPLOYMENT_FILE = 'frontend-deployment.yaml'
     }
 
     stages {
         stage('Checkout Repository') {
-                when {
-        branch 'master'
-    }
             steps {
                 script {
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: '*/master']],
+                    checkout([ 
+                        $class: 'GitSCM', 
+                        branches: [[name: '*/master']], 
                         userRemoteConfigs: [[
-                            url: REPO_URL,
-                            credentialsId: GIT_CREDENTIALS_ID
-                        ]]
+                            url: REPO_URL, 
+                            credentialsId: GIT_CREDENTIALS_ID 
+                        ]] 
                     ])
                 }
             }
         }
 
-        stage('Check User') {
-                when {
-        branch 'master'
-    }
-            steps {
-                script {
-                    sh 'whoami'
-                    sh 'id'
-                }
-            }
-        }
-
         stage('Build Docker Image') {
-                when {
-        branch 'master'
-    }
             steps {
                 script {
-                    frontendImage = docker.build("${IMAGE_NAME}", "-f Dockerfile .")
-                }
-            }
-        }
-
-        stage('Push Image to DockerHub') {
-                when {
-        branch 'master'
-    }
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', REGISTRY_CREDENTIAL) {
-                        frontendImage.push('latest')
-                    }
-                }
-            }
-        }
-
-        stage('Start Minikube') {
-                when {
-        branch 'master'
-    }
-            steps {
-                script {
-                    sh '''
-                        if ! minikube status | grep -q "Running"; then
-                            echo "Minikube is not running. Starting Minikube..."
-                            minikube start
-                        else
-                            echo "Minikube is already running."
-                        fi
-                    '''
+                    docker.build("${IMAGE_NAME}", "-f Dockerfile .")
                 }
             }
         }
 
         stage('Deploy to Minikube') {
-                when {
-        branch 'master'
-    }
             steps {
                 script {
                     checkout([$class: 'GitSCM',
-                    branches: [[name: '*/DEVOPS-4']],
-                    extensions: [],
-                    userRemoteConfigs: [[
-                        credentialsId: 'git_secret', 
-                        url: 'https://github.com/co-consult/jenkins-devops.git'
-                    ]]
-                ])
+                        branches: [[name: '*/DEVOPS-4']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'git_secret', 
+                            url: 'https://github.com/co-consult/jenkins-devops.git'
+                        ]]
+                    ])
                     sh "ls -l ${WORKSPACE}"
                     sh "minikube kubectl -- apply -f ${DEPLOYMENT_FILE}"
                 }
