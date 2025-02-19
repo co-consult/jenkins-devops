@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ousshen/frontback:back-latest
+        image: backfront:backend-latest
         ports:
         - containerPort: 8080
 ---
