@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+     environment {
+        IMAGE_NAME = 'cogeex:eureka-latest'
+        DEPLOYMENT_FILE = 'cogeex-eureka.yaml'
+    }
+        
+    stages {
+        stage('Checkout Repo') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/Task-1521']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'azure_secret', 
+                            url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/cogeex-eureka'
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}", "-f Dockerfile .")
+                }
+            }
+        }
+
+    }
+}

@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+     environment {
+        IMAGE_NAME = 'cogeex:auth-service-latest'
+        DEPLOYMENT_FILE = 'cogeex-auth-service.yaml'
+    }
+        
+    stages {
+        stage('Checkout Repo') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/Task-1521']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'azure_secret', 
+                            url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-auth-service'
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}", "-f Dockerfile .")
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+     environment {
+        IMAGE_NAME = 'cogeex:frontend-latest'
+        DEPLOYMENT_FILE = 'cogeex-frontend-deployment.yaml'
+    }
+        
+    stages {
+        stage('Checkout Repo') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/develop']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'azure_secret', 
+                            url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-FrontEnd'
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}", "-f Dockerfile .")
+                }
+            }
+        }
+
+    }
+}

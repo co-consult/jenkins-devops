@@ -1,0 +1,30 @@
+pipeline{
+    agent any
+    stages{
+                stage('Deploy to Minikube') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/master']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'git_secret', 
+                            url: 'https://github.com/oussexist/devops2.git'
+                        ]]
+                    ])
+                    sh "kubectl apply -f cogeex-db.yaml"
+                    sh "kubectl apply -f cogeex-eureka.yaml"
+                    sh "kubectl apply -f cogeex-gateway.yaml"
+                    sh 'sleep 60' 
+                    sh "kubectl apply -f cogeex-auth-service.yaml"
+                    sh "kubectl apply -f cogeex-company-service.yaml"
+                    sh "kubectl apply -f cogeex-profile-service.yaml"
+                    sh "kubectl apply -f cogeex-project-service.yaml"
+                    sh "kubectl apply -f cogeex-parser-service.yaml"
+                    sh "kubectl apply -f cogeex-frontend-deployment.yaml"
+                }
+            }
+        }
+        
+    }    
+}
