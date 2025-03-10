@@ -5,11 +5,11 @@ pipeline{
             steps {
                 script {
                     checkout([$class: 'GitSCM',
-                        branches: [[name: '*/master']],
+                        branches: [[name: '*/DEVOPS-13']],
                         extensions: [],
                         userRemoteConfigs: [[
                             credentialsId: 'git_secret', 
-                            url: 'https://github.com/oussexist/devops2.git'
+                            url: 'https://github.com/co-consult/jenkins-devops'
                         ]]
                     ])
                     sh "kubectl apply -f cogeex-db.yaml"

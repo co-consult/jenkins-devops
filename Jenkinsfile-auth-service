@@ -10,7 +10,7 @@ pipeline {
             steps {
                 script {
                     checkout([$class: 'GitSCM',
-                        branches: [[name: '*/Task-1521']],
+                        branches: [[name: '*/develop']],
                         extensions: [],
                         userRemoteConfigs: [[
                             credentialsId: 'azure_secret', 
