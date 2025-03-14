@@ -32,7 +32,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: profile-service
+  name: cogeex-profile-service
 spec:
   type: ClusterIP
   selector:
