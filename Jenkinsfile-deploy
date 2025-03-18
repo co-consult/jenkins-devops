@@ -1,7 +1,7 @@
 pipeline{
     agent any
     stages{
-                stage('Deploy to Minikube') {
+            stage('Deploy to Minikube') {
             steps {
                 script {
                     checkout([$class: 'GitSCM',

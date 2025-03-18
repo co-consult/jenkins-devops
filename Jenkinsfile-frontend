@@ -27,6 +27,22 @@ pipeline {
                 }
             }
         }
+                    stage('Deploy to Minikube') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/DEVOPS-13']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'git_secret', 
+                            url: 'https://github.com/co-consult/jenkins-devops'
+                        ]]
+                    ])
+
+                    sh "kubectl delete -f cogeex-frontend-deployment.yaml"
+                }
+            }
+        }
 
     }
 }

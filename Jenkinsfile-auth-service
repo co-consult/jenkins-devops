@@ -27,5 +27,21 @@ pipeline {
                 }
             }
         }
+        stage('Delete old ressources') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/DEVOPS-13']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'git_secret', 
+                            url: 'https://github.com/co-consult/jenkins-devops'
+                        ]]
+                    ])
+                    sh "kubectl delete -f cogeex-db.yaml"
+                    sh "kubectl delete -f cogeex-auth-service.yaml"
+                }
+            }
+        }
     }
 }
