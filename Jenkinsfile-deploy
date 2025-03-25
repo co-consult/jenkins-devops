@@ -21,6 +21,7 @@ pipeline{
                     sh "kubectl apply -f cogeex-profile-service.yaml"
                     sh "kubectl apply -f cogeex-project-service.yaml"
                     sh "kubectl apply -f cogeex-parser-service.yaml"
+                    sh "kubectl apply -f cogeex-python-service.yaml"
                     sh "kubectl apply -f cogeex-frontend-deployment.yaml"
                 }
             }

@@ -20,14 +20,22 @@ spec:
         ports:
         - containerPort: 8000
         env:
-        - name: SPRING_PROFILES_ACTIVE
-          value: "test"
-        - name: SPRING_DATASOURCE_URL
-          value: "jdbc:postgresql://postgresql-db:5432/cogeex_v2_database"
-        - name: SPRING_DATASOURCE_USERNAME
-          value: "postgres"
-        - name: SPRING_DATASOURCE_PASSWORD
-          value: "admin"
+        - name: DB_NAME
+          value: "cogeex_v2_database"  
+        - name: DB_USER
+          value: "postgres"  
+        - name: DB_PASSWORD
+          value: "admin"     
+        - name: DB_HOST
+          value: "postgresql-db" 
+        - name: DB_PORT
+          value: "5432"
+        - name: API_HOST
+          value: "0.0.0.0"   
+        - name: API_PORT
+          value: "8000"      
+        - name: API_RELOAD
+          value: "true" 
 ---
 apiVersion: v1
 kind: Service
