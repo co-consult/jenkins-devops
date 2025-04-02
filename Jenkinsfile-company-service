@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    triggers {
+        pollSCM('0 8 * * *')
+    }
      environment {
         IMAGE_NAME = 'cogeex:company-service-latest'
         DEPLOYMENT_FILE = 'cogeex-company-service.yaml'
