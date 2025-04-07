@@ -43,6 +43,14 @@ pipeline {
                     ])
 
                     sh "kubectl delete -f cogeex-profile-service.yaml"
+                    sh '''
+                if kubectl get -f cogeex-profile-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-profile-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                 '''
                 }
             }
         }

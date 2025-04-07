@@ -49,6 +49,14 @@ pipeline {
                     sh "kubectl delete -f cogeex-project-service.yaml"
                     sh "kubectl delete -f cogeex-parser-service.yaml"
                     sh "kubectl delete -f cogeex-frontend-deployment.yaml"
+                    sh '''
+                if kubectl get -f cogeex-eureka.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-eureka.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                 '''
                 }
             }
         }

@@ -41,7 +41,14 @@ pipeline {
                             url: 'https://github.com/co-consult/jenkins-devops'
                         ]]
                     ])
-                    sh "kubectl delete -f cogeex-parser-service.yaml"
+                    sh '''
+                if kubectl get -f cogeex-parser-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-parser-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                 '''
 
                 }
             }
