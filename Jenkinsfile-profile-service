@@ -41,8 +41,6 @@ pipeline {
                             url: 'https://github.com/co-consult/jenkins-devops'
                         ]]
                     ])
-
-                    sh "kubectl delete -f cogeex-profile-service.yaml"
                     sh '''
                 if kubectl get -f cogeex-profile-service.yaml > /dev/null 2>&1; then
                     echo "Deleting existing Kubernetes resources..."

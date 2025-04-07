@@ -41,18 +41,53 @@ pipeline {
                             url: 'https://github.com/co-consult/jenkins-devops'
                         ]]
                     ])
-                    sh "kubectl delete -f cogeex-eureka.yaml"
-                    sh "kubectl delete -f cogeex-gateway.yaml"
-                    sh "kubectl delete -f cogeex-auth-service.yaml"
-                    sh "kubectl delete -f cogeex-company-service.yaml"
-                    sh "kubectl delete -f cogeex-profile-service.yaml"
-                    sh "kubectl delete -f cogeex-project-service.yaml"
-                    sh "kubectl delete -f cogeex-parser-service.yaml"
-                    sh "kubectl delete -f cogeex-frontend-deployment.yaml"
+                    
                     sh '''
                 if kubectl get -f cogeex-eureka.yaml > /dev/null 2>&1; then
                     echo "Deleting existing Kubernetes resources..."
                     kubectl delete -f cogeex-eureka.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                if kubectl get -f cogeex-gateway.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-gateway.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                if kubectl get -f cogeex-auth-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-auth-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                if kubectl get -f cogeex-company-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-company-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                if kubectl get -f cogeex-profile-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-profile-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                if kubectl get -f cogeex-project-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-project-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                if kubectl get -f cogeex-parser-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-parser-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                if kubectl get -f cogeex-matching-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-matching-service.yaml
                 else
                     echo "No existing resources to delete."
                 fi
