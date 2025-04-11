@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    triggers {
+        pollSCM('0 8 * * *')
+    }
+     environment {
+        IMAGE_NAME = 'cogeex:matching-service-latest'
+        DEPLOYMENT_FILE = 'cogeex-matching-service.yaml'
+    }
+        
+    stages {
+        stage('Checkout Repo') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/firstPush']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'azure_secret', 
+                            url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/cogeex_py_matching'
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}", "-f Dockerfile .")
+                }
+            }
+        }
+        stage('Delete old ressources') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/DEVOPS-13']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'git_secret', 
+                            url: 'https://github.com/co-consult/jenkins-devops'
+                        ]]
+                    ])
+                    sh '''
+                if kubectl get -f cogeex-matching-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-matching-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                 '''
+                }
+            }
+        }
+    }
+}

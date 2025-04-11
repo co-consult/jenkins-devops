@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matching-service
+  labels:
+    app: matching-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matching-service
+  template:
+    metadata:
+      labels:
+        app: matching-service
+    spec:
+      containers:
+      - name: matching-service
+        image: cogeex:matching-service-latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_NAME
+          value: "cogeex_v2_database"  
+        - name: DB_USER
+          value: "postgres"  
+        - name: DB_PASSWORD
+          value: "admin"     
+        - name: DB_HOST
+          value: "postgresql-db" 
+        - name: DB_PORT
+          value: "5432"
+        - name: API_HOST
+          value: "0.0.0.0"   
+        - name: API_PORT
+          value: "8000"      
+        - name: API_RELOAD
+          value: "true" 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cogeex-matching-service
+spec:
+  type: ClusterIP
+  selector:
+    app: matching-service
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000

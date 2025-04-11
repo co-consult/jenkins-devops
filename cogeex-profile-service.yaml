@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profile-service
+  labels:
+    app: profile-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: profile-service
+  template:
+    metadata:
+      labels:
+        app: profile-service
+    spec:
+      containers:
+      - name: profile-service
+        image: cogeex:profile-service-latest
+        ports:
+        - containerPort: 9090
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "test"
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgresql-db:5432/cogeex_v2_database"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "postgres"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "admin"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cogeex-profile-service
+spec:
+  type: ClusterIP
+  selector:
+    app: profile-service
+  ports:
+  - protocol: TCP
+    port: 9090
+    targetPort: 9090

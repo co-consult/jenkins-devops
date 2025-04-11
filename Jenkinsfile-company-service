@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+    triggers {
+        pollSCM('0 8 * * *')
+    }
+     environment {
+        IMAGE_NAME = 'cogeex:company-service-latest'
+        DEPLOYMENT_FILE = 'cogeex-company-service.yaml'
+    }
+        
+    stages {
+        stage('Checkout Repo') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/develop']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'azure_secret', 
+                            url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/cogeex-company-service'
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}", "-f Dockerfile .")
+                }
+            }
+        }
+        stage('Delete old ressources') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/DEVOPS-13']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'git_secret', 
+                            url: 'https://github.com/co-consult/jenkins-devops'
+                        ]]
+                    ])
+                    
+                    sh '''
+                if kubectl get -f cogeex-company-service.yaml > /dev/null 2>&1; then
+                    echo "Deleting existing Kubernetes resources..."
+                    kubectl delete -f cogeex-company-service.yaml
+                else
+                    echo "No existing resources to delete."
+                fi
+                 '''
+                }
+            }
+        }
+    }
+}
