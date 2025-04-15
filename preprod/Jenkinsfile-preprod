@@ -20,10 +20,10 @@ pipeline {
                 stage('Push Eureka') {
                     steps {
                         script {
-                            def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:eureka-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/eureka-latest ${imageTag}"
-                            docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                docker.image(imageTag).push()
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:eureka-latest-${BUILD_NUMBER}"
+                            sh "docker tag cogeex/eureka-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
                             }
                         }
                     }
@@ -31,10 +31,10 @@ pipeline {
                 stage('Push Gateway') {
                     steps {
                         script {
-                            def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:gateway-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/gateway-latest ${imageTag}"
-                            docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                docker.image(imageTag).push()
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:gateway-latest-${BUILD_NUMBER}"
+                            sh "docker tag cogeex/gateway-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
                             }
                         }
                     }
@@ -42,10 +42,10 @@ pipeline {
                 stage('Push Auth Service') {
                     steps {
                         script {
-                            def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:auth-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/auth-service-latest ${imageTag}"
-                            docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                docker.image(imageTag).push()
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:auth-service-latest-${BUILD_NUMBER}"
+                            sh "docker tag cogeex/auth-service-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
                             }
                         }
                     }
@@ -53,10 +53,10 @@ pipeline {
                 stage('Push Company Service') {
                     steps {
                         script {
-                            def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:company-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/company-service-latest ${imageTag}"
-                            docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                docker.image(imageTag).push()
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:company-service-latest-${BUILD_NUMBER}"
+                            sh "docker tag cogeex/company-service-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
                             }
                         }
                     }
@@ -64,10 +64,10 @@ pipeline {
                 stage('Push Profile Service') {
                     steps {
                         script {
-                            def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:profile-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/profile-service-latest ${imageTag}"
-                            docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                docker.image(imageTag).push()
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:profile-service-latest-${BUILD_NUMBER}"
+                            sh "docker tag cogeex/profile-service-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
                             }
                         }
                     }
@@ -75,10 +75,10 @@ pipeline {
                 stage('Push Project Service') {
                     steps {
                         script {
-                            def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:project-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/project-service-latest ${imageTag}"
-                            docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                docker.image(imageTag).push()
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:project-service-latest-${BUILD_NUMBER}"
+                            sh "docker tag cogeex/project-service-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
                             }
                         }
                     }
@@ -86,10 +86,21 @@ pipeline {
                 stage('Push Parser Service') {
                     steps {
                         script {
-                            def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:parser-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/parser-service-latest ${imageTag}"
-                            docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                docker.image(imageTag).push()
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:parser-service-latest-${BUILD_NUMBER}"
+                            sh "docker tag cogeex/parser-service-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
+                            }
+                        }
+                    }
+                }
+                stage('Push Matching Service') {
+                    steps {
+                        script {
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:matching-service-latest-${BUILD_NUMBER}"
+                            sh "docker tag cogeex/matching-service-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
                             }
                         }
                     }
@@ -97,7 +108,7 @@ pipeline {
                 stage('Push Python Service') {
                     steps {
                         script {
-                            echo "Warning: Python service image not found locally. Skipping push."
+                            echo "⚠️ Python service image not found or not tagged — skipping."
                         }
                     }
                 }
@@ -108,69 +119,39 @@ pipeline {
             steps {
                 checkout([$class: 'GitSCM',
                     branches: [[name: '*/develop']],
-                    extensions: [],
                     userRemoteConfigs: [[
                         credentialsId: "${AZURE_GIT_CRED_ID}",
                         url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-FrontEnd'
                     ]]
                 ])
                 script {
-                    def dockerfile = 'Dockerfile.preprod'
-                    def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest-${BUILD_NUMBER}"
-                    def customImage = docker.build(imageTag, "-f ${dockerfile} .")
-                    docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                        customImage.push()
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest-${BUILD_NUMBER}"
+                    sh '''
+                        docker build -t ${imageName} .
+                        docker images | grep frontend
+                    '''
+                    docker.withRegistry('', DOCKER_CRED_ID) {
+                        docker.image(imageName).push()
                     }
                 }
             }
         }
 
-        stage('Deploy to VPS') {
+        stage('Cleanup Dangling Images') {
             steps {
-                checkout([$class: 'GitSCM',
-                    branches: [[name: "*/${JENKINS_DEVOPS_BRANCH}"]],
-                    extensions: [],
-                    userRemoteConfigs: [[
-                        credentialsId: "${GIT_CRED_ID}",
-                        url: "${JENKINS_DEVOPS_REPO}"
-                    ]]
-                ])
-                sshagent(credentials: ["${SSH_CRED_ID}"]) {
-                    sh """
-                    mkdir -p manifests
-                    cp jenkins-devops/*.yaml manifests/
-                    scp -o StrictHostKeyChecking=no manifests/*.yaml ${VPS_USER}@${VPS_HOST}:/home/${VPS_USER}/manifests/
-                    ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} << 'EOF'
-                        mkdir -p /home/${VPS_USER}/manifests
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml || echo "Warning: cogeex-db.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml || echo "Warning: cogeex-eureka.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml || echo "Warning: cogeex-gateway.yaml failed"
-                        kubectl wait --for=condition=ready pod -l app=cogeex-eureka --timeout=120s || echo "Warning: Eureka pods not ready"
-                        kubectl wait --for=condition=ready pod -l app=cogeex-gateway --timeout=120s || echo "Warning: Gateway pods not ready"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml || echo "Warning: cogeex-auth-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml || echo "Warning: cogeex-company-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml || echo "Warning: cogeex-profile-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml || echo "Warning: cogeex-project-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml || echo "Warning: cogeex-parser-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml || echo "Warning: cogeex-python-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-deployment.yaml || echo "Warning: cogeex-frontend-deployment.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway-service.yaml || echo "Warning: cogeex-gateway-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-service.yaml || echo "Warning: cogeex-frontend-service.yaml failed"
-                        kubectl get pods -A
-                        kubectl get svc
-                    EOF
-                    """
+                script {
+                    sh '''
+                        echo "Cleaning up dangling images..."
+                        docker image prune -f
+                    '''
                 }
             }
         }
     }
 
     post {
-        success {
-            echo "Deployment done!"
-        }
-        failure {
-            echo "Deployment failed. Check logs."
+        always {
+            echo " Pipeline complete — Build #${BUILD_NUMBER}"
         }
     }
 }
