@@ -21,9 +21,9 @@ pipeline {
                     steps {
                         script {
                             def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:eureka-latest-${BUILD_NUMBER}"
-                            def customImage = docker.image('cogeex/eureka-latest')
+                            sh "docker tag cogeex/eureka-latest ${imageTag}"
                             docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                customImage.push(imageTag)
+                                docker.image(imageTag).push()
                             }
                         }
                     }
@@ -32,9 +32,9 @@ pipeline {
                     steps {
                         script {
                             def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:gateway-latest-${BUILD_NUMBER}"
-                            def customImage = docker.image('cogeex/gateway-latest')
+                            sh "docker tag cogeex/gateway-latest ${imageTag}"
                             docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                customImage.push(imageTag)
+                                docker.image(imageTag).push()
                             }
                         }
                     }
@@ -43,9 +43,9 @@ pipeline {
                     steps {
                         script {
                             def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:auth-service-latest-${BUILD_NUMBER}"
-                            def customImage = docker.image('cogeex/auth-service-latest')
+                            sh "docker tag cogeex/auth-service-latest ${imageTag}"
                             docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                customImage.push(imageTag)
+                                docker.image(imageTag).push()
                             }
                         }
                     }
@@ -54,9 +54,9 @@ pipeline {
                     steps {
                         script {
                             def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:company-service-latest-${BUILD_NUMBER}"
-                            def customImage = docker.image('cogeex/company-service-latest')
+                            sh "docker tag cogeex/company-service-latest ${imageTag}"
                             docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                customImage.push(imageTag)
+                                docker.image(imageTag).push()
                             }
                         }
                     }
@@ -65,9 +65,9 @@ pipeline {
                     steps {
                         script {
                             def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:profile-service-latest-${BUILD_NUMBER}"
-                            def customImage = docker.image('cogeex/profile-service-latest')
+                            sh "docker tag cogeex/profile-service-latest ${imageTag}"
                             docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                customImage.push(imageTag)
+                                docker.image(imageTag).push()
                             }
                         }
                     }
@@ -76,9 +76,9 @@ pipeline {
                     steps {
                         script {
                             def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:project-service-latest-${BUILD_NUMBER}"
-                            def customImage = docker.image('cogeex/project-service-latest')
+                            sh "docker tag cogeex/project-service-latest ${imageTag}"
                             docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                customImage.push(imageTag)
+                                docker.image(imageTag).push()
                             }
                         }
                     }
@@ -87,9 +87,9 @@ pipeline {
                     steps {
                         script {
                             def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:parser-service-latest-${BUILD_NUMBER}"
-                            def customImage = docker.image('cogeex/parser-service-latest')
+                            sh "docker tag cogeex/parser-service-latest ${imageTag}"
                             docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                customImage.push(imageTag)
+                                docker.image(imageTag).push()
                             }
                         }
                     }
@@ -98,11 +98,6 @@ pipeline {
                     steps {
                         script {
                             echo "Warning: Python service image not found locally. Skipping push."
-                            def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:matching-service-latest-${BUILD_NUMBER}"
-                            def customImage = docker.image('cogeex/python-service-latest')
-                            docker.withRegistry('', "${DOCKER_CRED_ID}") {
-                                customImage.push(imageTag)
-                            }
                         }
                     }
                 }
