@@ -1,0 +1,286 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = 'ousshen'
+        DOCKER_REPO = 'cogeex'
+        DOCKER_CRED_ID = 'docker_creds'
+        SSH_CRED_ID = 'ssh-credentials'
+        AZURE_GIT_CRED_ID = 'azure_secret'
+        GIT_CRED_ID = 'git_secret'
+        JENKINS_DEVOPS_REPO = 'https://github.com/co-consult/jenkins-devops'
+        JENKINS_DEVOPS_BRANCH = 'DEVOPS-13'
+        VPS_USER = 'ubuntu'
+        VPS_HOST = '20.19.38.22'
+    }
+
+    stages {
+        stage('Build All Images') {
+            parallel {
+                stage('Build Eureka') {
+                    steps {
+                        dir('eureka') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-eureka'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:eureka-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build Gateway') {
+                    steps {
+                        dir('gateway') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-gateway'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:gateway-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                   
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build Auth Service') {
+                    steps {
+                        dir('auth-service') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-auth-service'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:auth-service-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                   
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build Company Service') {
+                    steps {
+                        dir('company-service') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-company-service'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:company-service-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                   
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build Profile Service') {
+                    steps {
+                        dir('profile-service') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-profile-service'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:profile-service-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                   
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build Project Service') {
+                    steps {
+                        dir('project-service') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-project-service'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:project-service-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                   
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build Parser Service') {
+                    steps {
+                        dir('parser-service') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-parser-service'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:parser-service-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                   
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build Python Service') {
+                    steps {
+                        dir('python-service') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-python-service'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:python-service-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                   
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build Frontend') {
+                    steps {
+                        dir('frontend') {
+                            checkout([$class: 'GitSCM',
+                                branches: [[name: '*/develop']],
+                                extensions: [],
+                                userRemoteConfigs: [[
+                                    credentialsId: "${AZURE_GIT_CRED_ID}",
+                                    url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-FrontEnd'
+                                ]]
+                            ])
+                            script {
+                                def imageTag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest-${BUILD_NUMBER}"
+                                docker.build("${imageTag}", "-f Dockerfile.preprod .")
+                                withCredentials([usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                   
+                                    sh "docker push ${imageTag}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to VPS') {
+            steps {
+                script {
+                    // Checkout manifests
+                    dir('jenkins-devops') {
+                        checkout([$class: 'GitSCM',
+                            branches: [[name: "*/${JENKINS_DEVOPS_BRANCH}"]],
+                            extensions: [],
+                            userRemoteConfigs: [[
+                                credentialsId: "${GIT_CRED_ID}",
+                                url: "${JENKINS_DEVOPS_REPO}"
+                            ]]
+                        ])
+                    }
+
+                    withCredentials([sshUserPrivateKey(credentialsId: "${SSH_CRED_ID}", keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                        sh """
+                        # Copy manifests to VM
+                        scp -i \${SSH_KEY} -o StrictHostKeyChecking=no jenkins-devops/*.yaml ${VPS_USER}@${VPS_HOST}:/home/${VPS_USER}/manifests/
+
+                        # SSH and apply manifests
+                        ssh -i \${SSH_KEY} -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} << 'EOF'
+                            mkdir -p /home/${VPS_USER}/manifests
+
+                            # Update manifests with image tags
+                            sed -i 's|image:.*eureka:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:eureka-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-eureka.yaml
+                            sed -i 's|image:.*gateway:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:gateway-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-gateway.yaml
+                            sed -i 's|image:.*auth-service:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:auth-service-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
+                            sed -i 's|image:.*company-service:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:company-service-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-company-service.yaml
+                            sed -i 's|image:.*profile-service:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:profile-service-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
+                            sed -i 's|image:.*project-service:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:project-service-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-project-service.yaml
+                            sed -i 's|image:.*parser-service:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:parser-service-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
+                            sed -i 's|image:.*python-service:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:python-service-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-python-service.yaml
+                            sed -i 's|image:.*frontend:.*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest-${BUILD_NUMBER}|' /home/${VPS_USER}/manifests/cogeex-frontend-deployment.yaml
+
+                            # Apply manifests
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
+                            kubectl wait --for=condition=ready pod -l app=cogeex-eureka --timeout=120s
+                            kubectl wait --for=condition=ready pod -l app=cogeex-gateway --timeout=120s
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-deployment.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-service.yaml
+                        EOF
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pre-prod deployment completed successfully!"
+        }
+        failure {
+            echo "Deployment failed. Check Jenkins logs."
+        }
+    }
+}
