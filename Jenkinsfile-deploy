@@ -15,8 +15,7 @@ pipeline{
                     sh "kubectl apply -f cogeex-db.yaml"
                     sh "kubectl apply -f cogeex-eureka.yaml"
                     sh "kubectl apply -f cogeex-gateway.yaml"
-                    sh 'kubectl wait --for=condition=ready pod -l app=cogeex-eureka --timeout=120s' 
-                    sh 'kubectl wait --for=condition=ready pod -l app=cogeex-gateway --timeout=120s'
+                    sh 'sleep 60' 
                     sh "kubectl apply -f cogeex-auth-service.yaml"
                     sh "kubectl apply -f cogeex-company-service.yaml"
                     sh "kubectl apply -f cogeex-profile-service.yaml"
