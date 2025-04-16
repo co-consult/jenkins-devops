@@ -156,7 +156,7 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
-                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-deployment.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-service.yaml
                             kubectl get pods -A
