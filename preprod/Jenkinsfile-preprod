@@ -133,30 +133,35 @@ pipeline {
             steps {
                 sshagent(credentials: ["${SSH_CRED_ID}"]) {
                     sh """
-                    echo "[INFO] Transferring YAML manifests to VPS..."
+                        echo "[INFO] Transferring YAML manifests to VPS..."
 
-                    # Copy the manifests from the local Jenkins workspace to the remote VPS
-                    scp -o StrictHostKeyChecking=no manifests/*.yaml ${VPS_SSH}:${VPS_USER_HOME}/manifests/
+                        # Copy the manifests from the local Jenkins workspace to the remote VPS
+                        scp -o StrictHostKeyChecking=no manifests/*.yaml ${VPS_SSH}:${VPS_USER_HOME}/manifests/
 
-                    echo "[INFO] Deploying to Kubernetes on VPS..."
+                        echo "[INFO] Deploying to Kubernetes on VPS..."
 
-                    # SSH into VPS, apply the manifests and pull the latest images
-                    ssh -o StrictHostKeyChecking=no ${VPS_SSH} << EOF
-                        echo "[INFO] Setting up the manifests folder on VPS..."
-                        mkdir -p ${VPS_USER_HOME}/manifests
+                        # SSH into VPS, apply the manifests and pull the latest images
+                        ssh -o StrictHostKeyChecking=no ${VPS_SSH} << EOF
+                            echo "[INFO] Setting up the manifests folder on VPS..."
+                            mkdir -p ${VPS_USER_HOME}/manifests
 
-                        echo "[INFO] Moving YAML files to manifests folder..."
-                        mv ${VPS_USER_HOME}/manifests/*.yaml ${VPS_USER_HOME}/manifests/
-
-                        echo "[INFO] Applying Kubernetes manifests..."
-                        kubectl apply -f ${VPS_USER_HOME}/manifests/
-
-                        # Ensure the pods are running correctly
-                        kubectl get pods -A
-
-                        echo "[INFO] Verifying services..."
-                        kubectl get svc
-                    EOF
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
+                            kubectl wait --for=condition=ready pod -l app=cogeex-eureka --timeout=120s
+                            kubectl wait --for=condition=ready pod -l app=cogeex-gateway --timeout=120s
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway-service.yaml
+                            kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-service.yaml
+                            kubectl get pods -A
+                            kubectl get svc
+                        EOF
                     """
                 }
             }
