@@ -21,7 +21,7 @@ pipeline {
                     steps {
                         script {
                             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:eureka-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/eureka-latest ${tag}"
+                            sh "docker tag eureka-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
                             }
@@ -32,7 +32,7 @@ pipeline {
                     steps {
                         script {
                             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:gateway-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/gateway-latest ${tag}"
+                            sh "docker tag gateway-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
                             }
@@ -43,7 +43,7 @@ pipeline {
                     steps {
                         script {
                             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:auth-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/auth-service-latest ${tag}"
+                            sh "docker tag auth-service-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
                             }
@@ -54,7 +54,7 @@ pipeline {
                     steps {
                         script {
                             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:company-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/company-service-latest ${tag}"
+                            sh "docker tag company-service-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
                             }
@@ -65,7 +65,7 @@ pipeline {
                     steps {
                         script {
                             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:profile-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/profile-service-latest ${tag}"
+                            sh "docker tag profile-service-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
                             }
@@ -76,7 +76,7 @@ pipeline {
                     steps {
                         script {
                             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:project-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/project-service-latest ${tag}"
+                            sh "docker tag project-service-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
                             }
@@ -87,7 +87,7 @@ pipeline {
                     steps {
                         script {
                             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:parser-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/parser-service-latest ${tag}"
+                            sh "docker tag parser-service-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
                             }
@@ -98,7 +98,7 @@ pipeline {
                     steps {
                         script {
                             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:matching-service-latest-${BUILD_NUMBER}"
-                            sh "docker tag cogeex/matching-service-latest ${tag}"
+                            sh "docker tag matching-service-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
                             }
