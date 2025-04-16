@@ -129,35 +129,30 @@ pipeline {
 
         stage('Deploy to VPS') {
             steps {
-                checkout([$class: 'GitSCM',
-                    branches: [[name: "*/${JENKINS_DEVOPS_BRANCH}"]],
-                    userRemoteConfigs: [[
-                        credentialsId: "${GIT_CRED_ID}",
-                        url: "${JENKINS_DEVOPS_REPO}"
-                    ]]
-                ])
                 sshagent(credentials: ["${SSH_CRED_ID}"]) {
                     sh """
-                    mkdir -p manifests
-                    cp jenkins-devops/*.yaml manifests/
-                    scp -o StrictHostKeyChecking=no manifests/*.yaml ${VPS_USER}@${VPS_HOST}:/home/${VPS_USER}/manifests/
-                    ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_HOST} << 'EOF'
-                        mkdir -p /home/${VPS_USER}/manifests
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml || echo "Warning: cogeex-db.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml || echo "Warning: cogeex-eureka.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml || echo "Warning: cogeex-gateway.yaml failed"
-                        kubectl wait --for=condition=ready pod -l app=cogeex-eureka --timeout=120s || echo "Warning: Eureka pods not ready"
-                        kubectl wait --for=condition=ready pod -l app=cogeex-gateway --timeout=120s || echo "Warning: Gateway pods not ready"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml || echo "Warning: cogeex-auth-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml || echo "Warning: cogeex-company-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml || echo "Warning: cogeex-profile-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml || echo "Warning: cogeex-project-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml || echo "Warning: cogeex-parser-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml || echo "Warning: cogeex-python-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-deployment.yaml || echo "Warning: cogeex-frontend-deployment.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway-service.yaml || echo "Warning: cogeex-gateway-service.yaml failed"
-                        kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-service.yaml || echo "Warning: cogeex-frontend-service.yaml failed"
+                    echo "[INFO] Transferring YAML manifests to VPS..."
+
+                    # Copy the manifests from the local Jenkins workspace to the remote VPS
+                    scp -o StrictHostKeyChecking=no manifests/*.yaml ${VPS_SSH}:${VPS_USER_HOME}/manifests/
+
+                    echo "[INFO] Deploying to Kubernetes on VPS..."
+
+                    # SSH into VPS, apply the manifests and pull the latest images
+                    ssh -o StrictHostKeyChecking=no ${VPS_SSH} << EOF
+                        echo "[INFO] Setting up the manifests folder on VPS..."
+                        mkdir -p ${VPS_USER_HOME}/manifests
+
+                        echo "[INFO] Moving YAML files to manifests folder..."
+                        mv ${VPS_USER_HOME}/manifests/*.yaml ${VPS_USER_HOME}/manifests/
+
+                        echo "[INFO] Applying Kubernetes manifests..."
+                        kubectl apply -f ${VPS_USER_HOME}/manifests/
+
+                        # Ensure the pods are running correctly
                         kubectl get pods -A
+
+                        echo "[INFO] Verifying services..."
                         kubectl get svc
                     EOF
                     """
@@ -165,13 +160,8 @@ pipeline {
             }
         }
 
-        stage('Cleanup Dangling Images') {
-            steps {
-                script {
-                    sh 'docker image prune -f'
-                }
-            }
-        }
+
+    
     }
 
     post {
