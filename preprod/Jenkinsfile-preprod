@@ -12,6 +12,8 @@ pipeline {
         JENKINS_DEVOPS_BRANCH = 'DEVOPS-13'
         VPS_USER = 'ubuntu'
         VPS_HOST = '20.19.38.22'
+        VPS_SSH = 'ubuntu@20.19.38.22'
+        VPS_USER_HOME = '/home/ubuntu'
     }
 
     stages {
