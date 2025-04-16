@@ -105,13 +105,6 @@ pipeline {
                         }
                     }
                 }
-                stage('Push Python Service') {
-                    steps {
-                        script {
-                            echo "⚠️ Python service image not found or not tagged — skipping."
-                        }
-                    }
-                }
             }
         }
 
@@ -126,10 +119,7 @@ pipeline {
                 ])
                 script {
                     def imageName = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest-${BUILD_NUMBER}"
-                    sh '''
-                        docker build -t ${imageName} .
-                        docker images | grep frontend
-                    '''
+                    docker.build("${IMAGE_NAME}", "-f Dockerfile .")
                     docker.withRegistry('', DOCKER_CRED_ID) {
                         docker.image(imageName).push()
                     }
