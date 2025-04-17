@@ -121,7 +121,7 @@ pipeline {
                 ])
                 script {
                     def imageName = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest"
-                    docker.build("${imageName}", "-f Dockerfile .")
+                    docker.build("${imageName}", "-f Dockerfile.preprod .")
                     docker.withRegistry('', DOCKER_CRED_ID) {
                         docker.image(imageName).push()
                     }
@@ -144,12 +144,9 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${VPS_SSH} << EOF
                             echo "[INFO] Setting up the manifests folder on VPS..."
                             mkdir -p ${VPS_USER_HOME}/manifests
-
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
-                            kubectl wait --for=condition=ready pod -l app=cogeex-eureka --timeout=120s
-                            kubectl wait --for=condition=ready pod -l app=cogeex-gateway --timeout=120s
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
@@ -158,8 +155,6 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-deployment.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
-                            kubectl get pods -A
-                            kubectl get svc
                         EOF
                     """
                 }
