@@ -158,7 +158,7 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
-                            sh 'sleep 30'
+                            sleep 60
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
