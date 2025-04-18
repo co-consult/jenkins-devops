@@ -128,7 +128,17 @@ pipeline {
                 }
             }
         }
-
+        stage('Clone and Prepare Manifests') {
+            steps {
+                dir('manifests') {
+                    sh '''
+                        rm -rf temp-manifests
+                        git clone -b $JENKINS_DEVOPS_BRANCH $JENKINS_DEVOPS_REPO temp-manifests
+                        cp temp-manifests/preprod/*.yaml .
+                    '''
+                }
+            }
+        }
         stage('Deploy to VPS') {
             steps {
                 sshagent(credentials: ["${SSH_CRED_ID}"]) {
