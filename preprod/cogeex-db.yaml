@@ -1,3 +1,28 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgresql-db-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/postgresql-db
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: postgresql-db-pv  # bind directly to the PV above
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,7 +51,7 @@ spec:
             - containerPort: 5432
           volumeMounts:
             - name: postgresql-db-storage
-              mountPath: /var/lib/postgresql-db/data
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: postgresql-db-storage
           persistentVolumeClaim:
@@ -44,14 +69,3 @@ spec:
       port: 5432
       targetPort: 5432
   clusterIP: None
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgresql-db-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
