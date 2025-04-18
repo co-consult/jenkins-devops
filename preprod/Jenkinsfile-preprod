@@ -158,19 +158,13 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
-                            sleep 5
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
-                            sleep 10
+                            kubectl wait --for=condition=available --timeout=30s deployment/auth-service
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
-                            sleep 5
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
-                            sleep 5
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
-                            sleep 5
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
-                            sleep 5
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
-                            sleep 5
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
                     """
                 }
