@@ -14,9 +14,11 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: frontend
-        image: cogeex:frontend-latest
+        image: ousshen/cogeex:frontend-latest
         ports:
         - containerPort: 80
 ---

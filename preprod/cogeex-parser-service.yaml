@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parser-service
+  labels:
+    app: parser-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parser-service
+  template:
+    metadata:
+      labels:
+        app: parser-service
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: parser-service
+        image: ousshen/cogeex:parser-service-latest
+        ports:
+        - containerPort: 9094
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "test"
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgresql-db:5432/cogeex_v2_database"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "postgres"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "admin"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cogeex-parser-service
+spec:
+  type: ClusterIP
+  selector:
+    app: parser-service
+  ports:
+  - protocol: TCP
+    port: 9094
+    targetPort: 9094
