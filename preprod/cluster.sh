@@ -35,7 +35,7 @@ if [ "$(lsb_release -is)" != "Ubuntu" ] || [ "$(lsb_release -rs)" != "22.04" ]; 
 fi
 
 # Variables
-IP_ADDRESS="10.0.0.4"
+IP_ADDRESS="10.0.1.4"
 if [ "$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)" != "$IP_ADDRESS" ]; then
     echo "Error: IP_ADDRESS does not match eth0 IP"
     exit 1
@@ -137,52 +137,24 @@ chown ubuntu:ubuntu /home/ubuntu/.kube/config
 # Remove taint for single-node cluster
 su - ubuntu -c "kubectl taint nodes master node-role.kubernetes.io/control-plane:NoSchedule- || true"
 
-# Install Calico network plugin
-su - ubuntu -c "kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml" || {
+# Download and apply Calico manifest directly
+curl -fsSL https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml -o calico.yaml || {
+    echo "Error: Failed to download Calico manifest"
+    exit 1
+}
+
+# Apply Calico
+su - ubuntu -c "kubectl apply -f calico.yaml" || {
     echo "Error: Failed to apply Calico"
     exit 1
 }
+
+# Wait for Calico pods to become ready
 su - ubuntu -c "kubectl wait --for=condition=ready pod -l k8s-app=calico-node -n kube-system --timeout=120s" || {
     echo "Error: Calico pods not ready"
     exit 1
 }
 
-# Install MetalLB
-su - ubuntu -c "kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-frr.yaml" || {
-    echo "Error: Failed to apply MetalLB"
-    exit 1
-}
-su - ubuntu -c "kubectl wait --for=condition=ready pod -l app=metallb -n metallb-system --timeout=120s" || {
-    echo "Error: MetalLB pods not ready"
-    exit 1
-}
-
-# Create and apply MetalLB configuration
-cat > /home/ubuntu/metallb-config.yaml << EOF
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: default
-  namespace: metallb-system
-spec:
-  addresses:
-  - 10.0.0.100-10.0.0.150
----
-apiVersion: metallb.io/v1beta1
-kind: L2Advertisement
-metadata:
-  name: default
-  namespace: metallb-system
-EOF
-chown ubuntu:ubuntu /home/ubuntu/metallb-config.yaml
-su - ubuntu -c "kubectl apply -f /home/ubuntu/metallb-config.yaml" || {
-    echo "Error: Failed to apply MetalLB config"
-    exit 1
-}
-
-# Verify cluster
-su - ubuntu -c "kubectl get nodes"
-su - ubuntu -c "kubectl get pods -A"
 
 # Reboot system
 echo "Setup complete. Rebooting in 10 seconds (Ctrl+C to cancel)..."
