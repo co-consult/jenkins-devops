@@ -9,7 +9,7 @@ pipeline {
         AZURE_GIT_CRED_ID = 'azure_secret'
         GIT_CRED_ID = 'git_secret'
         JENKINS_DEVOPS_REPO = 'https://github.com/co-consult/jenkins-devops'
-        JENKINS_DEVOPS_BRANCH = 'DEVOPS-26'
+        JENKINS_DEVOPS_BRANCH = 'DEVOPS-24'
         VPS_USER = 'azureadmin'
         VPS_HOST = '20.16.243.138'
         VPS_SSH = 'azureadmin@20.16.243.138'
@@ -107,18 +107,8 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-
-        stage('Build and Push Frontend') {
+                        stage('Build and Push Frontend') {
             steps {
-                checkout([$class: 'GitSCM',
-                    branches: [[name: '*/develop']],
-                    userRemoteConfigs: [[
-                        credentialsId: "${AZURE_GIT_CRED_ID}",
-                        url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-FrontEnd'
-                    ]]
-                ])
                 script {
                     def imageName = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest"
                     docker.build("${imageName}", "-f Dockerfile.preprod .")
@@ -127,7 +117,11 @@ pipeline {
                     }
                 }
             }
+                }
+            }
         }
+
+
         stage('Clone and Prepare Manifests') {
             steps {
                 dir('manifests') {
