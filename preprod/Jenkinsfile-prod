@@ -126,7 +126,7 @@ pipeline {
             steps {
                 dir('manifests') {
                     sh '''
-                        rm *.yaml
+                        rm -f *.yaml
                         rm -rf temp-manifests
                         git clone -b $JENKINS_DEVOPS_BRANCH $JENKINS_DEVOPS_REPO temp-manifests
                         cp temp-manifests/preprod/*.yaml .
