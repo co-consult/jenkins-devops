@@ -11,8 +11,8 @@ pipeline {
         JENKINS_DEVOPS_REPO = 'https://github.com/co-consult/jenkins-devops'
         JENKINS_DEVOPS_BRANCH = 'DEVOPS-24'
         VPS_USER = 'azureadmin'
-        VPS_HOST = '20.16.243.138'
-        VPS_SSH = 'azureadmin@20.16.243.138'
+        VPS_HOST = '40.119.130.52'
+        VPS_SSH = 'azureadmin@40.119.130.52'
         VPS_USER_HOME = '/home/azureadmin'
     }
 
@@ -107,16 +107,16 @@ pipeline {
                         }
                     }
                 }
-                        stage('Build and Push Frontend') {
-            steps {
-                script {
-                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest"
-                    docker.build("${imageName}", "-f Dockerfile.preprod .")
-                    docker.withRegistry('', DOCKER_CRED_ID) {
-                        docker.image(imageName).push()
+                stage('Push Frontend') {
+                    steps {
+                        script {
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest"
+                            sh "docker tag cogeex:frontend-prod-latest ${tag}"
+                            docker.withRegistry('', DOCKER_CRED_ID) {
+                                docker.image(tag).push()
+                            }
+                        }
                     }
-                }
-            }
                 }
             }
         }
