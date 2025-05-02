@@ -3,20 +3,20 @@ pipeline {
     triggers {
         pollSCM('0 8 * * *')
     }
-     environment {
+    environment {
         IMAGE_NAME = 'cogeex:frontend-latest'
         DEPLOYMENT_FILE = 'cogeex-frontend-deployment.yaml'
     }
-        
     stages {
         stage('Checkout Repo') {
             steps {
                 script {
+                    // Checkout the first repo into the default workspace
                     checkout([$class: 'GitSCM',
                         branches: [[name: '*/develop']],
-                        extensions: [],
+                        extensions: [], // No extensions needed for default workspace
                         userRemoteConfigs: [[
-                            credentialsId: 'azure_secret', 
+                            credentialsId: 'azure_secret',
                             url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-FrontEnd'
                         ]]
                     ])
@@ -30,28 +30,39 @@ pipeline {
                 }
             }
         }
-                    stage('Deploy to Minikube') {
+        stage('Deploy to Minikube') {
             steps {
                 script {
+                    // Checkout the second repo into a subdirectory to avoid overwriting
+                    dir('jenkins-devops') {
+                        checkout([$class: 'GitSCM',
+                            branches: [[name: '*/DEVOPS-13']],
+                            extensions: [],
+                            userRemoteConfigs: [[
+                                credentialsId: 'git_secret',
+                                url: 'https://github.com/co-consult/jenkins-devops'
+                            ]]
+                        ])
+                        // Run kubectl commands from the subdirectory
+                        sh '''
+                        if kubectl get -f cogeex-frontend-deployment.yaml > /dev/null 2>&1; then
+                            echo "Deleting existing Kubernetes resources..."
+                            kubectl delete -f cogeex-frontend-deployment.yaml
+                        else
+                            echo "No existing resources to delete."
+                        fi
+                        '''
+                    }
                     checkout([$class: 'GitSCM',
-                        branches: [[name: '*/DEVOPS-13']],
+                        branches: [[name: '*/develop']],
                         extensions: [],
                         userRemoteConfigs: [[
-                            credentialsId: 'git_secret', 
-                            url: 'https://github.com/co-consult/jenkins-devops'
+                            credentialsId: 'azure_secret',
+                            url: 'https://dev.azure.com/CoConsult/CoGeex%20v2/_git/Cogeex-FrontEnd'
                         ]]
                     ])
-                    sh '''
-                if kubectl get -f cogeex-frontend-deployment.yaml > /dev/null 2>&1; then
-                    echo "Deleting existing Kubernetes resources..."
-                    kubectl delete -f cogeex-frontend-deployment.yaml
-                else
-                    echo "No existing resources to delete."
-                fi
-                 '''
                 }
             }
         }
-
     }
 }
