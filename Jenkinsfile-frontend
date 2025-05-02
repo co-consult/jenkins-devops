@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        pollSCM('* * * * *')
+        pollSCM('0 8 * * *')
     }
      environment {
         IMAGE_NAME = 'cogeex:frontend-latest'
