@@ -5,7 +5,7 @@ pipeline {
         DOCKER_REGISTRY = 'ousshen'
         DOCKER_REPO = 'cogeex'
         DOCKER_CRED_ID = 'docker_creds'
-        SSH_CRED_ID = 'ssh-credentials'
+        SSH_CRED_ID = 'ssh-credentials-prod'
         AZURE_GIT_CRED_ID = 'azure_secret'
         GIT_CRED_ID = 'git_secret'
         JENKINS_DEVOPS_REPO = 'https://github.com/co-consult/jenkins-devops'
