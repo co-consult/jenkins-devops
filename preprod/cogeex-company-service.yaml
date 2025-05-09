@@ -19,6 +19,7 @@ spec:
       containers:
       - name: company-service
         image: ousshen/cogeex:company-service-latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 9093
         env:
