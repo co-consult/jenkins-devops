@@ -160,7 +160,6 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
-                            kubectl rollout restart deployment --namespace=default
                     """
                 }
             }
@@ -172,13 +171,14 @@ pipeline {
     post {
         always {
             echo "Pipeline complete — Build #${BUILD_NUMBER}"
+            mail bcc: '', body: "<b>Jenkins :</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "SUCCESS: Project name -> ${env.JOB_NAME}", to: "oussemajenkinstest@gmail.com";
         }
         success {
             echo "Deployment done!"
         }
         failure {
             echo "Deployment failed. Check logs."
-            mail bcc: '', body: "<b>Jenkins :</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "ERROR CI: Project name -> ${env.JOB_NAME}", to: "oussemajenkinstest@gmail.com";
+            mail bcc: '', body: "<b>Jenkins :</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "ERROR: Project name -> ${env.JOB_NAME}", to: "oussemajenkinstest@gmail.com";
         }
     }
 }
