@@ -147,17 +147,6 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${VPS_SSH} << EOF
                             echo "[INFO] Setting up the manifests folder on VPS..."
                             mkdir -p ${VPS_USER_HOME}/manifests
-                            echo "[INFO] Rolling out outdated services..."
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-db.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
-                            kubectl delete -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
                             echo "[INFO] Rolling out updated services..."
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
