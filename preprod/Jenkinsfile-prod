@@ -154,6 +154,8 @@ pipeline {
                             echo "Waiting for initialization."
                             sleep 60
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
+                            echo "Waiting for liquibase initialization."
+                            sleep 60
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
