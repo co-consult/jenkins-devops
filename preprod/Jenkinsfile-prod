@@ -147,6 +147,7 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${VPS_SSH} << EOF
                             echo "[INFO] Setting up the manifests folder on VPS..."
                             mkdir -p ${VPS_USER_HOME}/manifests
+                            kubectl delete deployment api-gateway auth-service company-service eureka-service frontend-deployment matching-service parser-service postgresql-db profile-service project-service  
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
@@ -159,15 +160,7 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
                             echo "[INFO] Rolling out updated services (excluding DB)..."
-                            kubectl rollout restart deployment/api-gateway
-                            kubectl rollout restart deployment/auth-service
-                            kubectl rollout restart deployment/company-service
-                            kubectl rollout restart deployment/eureka-service
-                            kubectl rollout restart deployment/frontend-deployment
-                            kubectl rollout restart deployment/matching-service
-                            kubectl rollout restart deployment/parser-service
-                            kubectl rollout restart deployment/profile-service
-                            kubectl rollout restart deployment/project-service
+
                     """
                 }
             }
