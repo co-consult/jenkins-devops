@@ -163,7 +163,8 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
-                            kubectl wait --for=condition=available --timeout=30s deployment/auth-service
+                            echo "Waiting for auth-service to initialize Liquibase..."
+                            sleep 60
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
