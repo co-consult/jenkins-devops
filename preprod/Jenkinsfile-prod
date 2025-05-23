@@ -120,8 +120,6 @@ pipeline {
                 }
             }
         }
-
-
         stage('Clone and Prepare Manifests') {
             steps {
                 dir('manifests') {
@@ -138,7 +136,7 @@ pipeline {
             steps {
                 sshagent(credentials: ["${SSH_CRED_ID}"]) {
                     sh """
-                        echo "[INFO] Transferring YAML manifests to VPS..."
+                        echo "[INFO] Transferring YAML manifests to VM..."
 
                         # Copy the manifests from the local Jenkins workspace to the remote VPS
                         scp -o StrictHostKeyChecking=no manifests/*.yaml ${VPS_SSH}:${VPS_USER_HOME}/manifests/
@@ -160,13 +158,20 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
+                            echo "[INFO] Rolling out updated services (excluding DB)..."
+                            kubectl rollout restart deployment/api-gateway
+                            kubectl rollout restart deployment/auth-service
+                            kubectl rollout restart deployment/company-service
+                            kubectl rollout restart deployment/eureka-service
+                            kubectl rollout restart deployment/frontend-deployment
+                            kubectl rollout restart deployment/matching-service
+                            kubectl rollout restart deployment/parser-service
+                            kubectl rollout restart deployment/profile-service
+                            kubectl rollout restart deployment/project-service
                     """
                 }
             }
-        }
-
-
-    
+        }   
     }
     post {
         always {
