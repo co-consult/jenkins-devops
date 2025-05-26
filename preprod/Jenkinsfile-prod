@@ -147,6 +147,8 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${VPS_SSH} << EOF
                             echo "[INFO] Setting up the manifests folder on VPS..."
                             mkdir -p ${VPS_USER_HOME}/manifests
+                            sudo rm -rf /mnt/data/postgresql-db
+                            kubectl delete -f /home/${VPS_USER}/manifests/.
                             echo "[INFO] Rolling out updated services..."
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
@@ -155,7 +157,7 @@ pipeline {
                             sleep 30
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
                             echo "Waiting for liquibase initialization."
-                            sleep 90
+                            sleep 60
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
