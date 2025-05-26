@@ -110,7 +110,7 @@ pipeline {
                 stage('Push Frontend') {
                     steps {
                         script {
-                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-latest"
+                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:frontend-prod-latest"
                             sh "docker tag cogeex:frontend-prod-latest ${tag}"
                             docker.withRegistry('', DOCKER_CRED_ID) {
                                 docker.image(tag).push()
@@ -152,18 +152,16 @@ pipeline {
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-gateway.yaml
                             echo "Waiting for initialization."
-                            sleep 60
+                            sleep 30
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-auth-service.yaml
                             echo "Waiting for liquibase initialization."
-                            sleep 60
+                            sleep 90
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-company-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-profile-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-project-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-parser-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-python-service.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-frontend-preprod.yaml
-                            
-
                     """
                 }
             }
