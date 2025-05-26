@@ -18,7 +18,7 @@ spec:
       - name: regcred
       containers:
       - name: frontend
-        image: ousshen/cogeex:frontend-latest
+        image: ousshen/cogeex:frontend-prod-latest
         ports:
         - containerPort: 80
 ---
