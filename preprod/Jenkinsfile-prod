@@ -96,17 +96,17 @@ pipeline {
                         }
                     }
                 }
-                stage('Push Matching Service') {
-                    steps {
-                        script {
-                            def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:matching-service-latest"
-                            sh "docker tag cogeex:matching-service-latest ${tag}"
-                            docker.withRegistry('', DOCKER_CRED_ID) {
-                                docker.image(tag).push()
-                            }
-                        }
-                    }
-                }
+                // stage('Push Matching Service') {
+                //     steps {
+                //         script {
+                //             def tag = "${DOCKER_REGISTRY}/${DOCKER_REPO}:matching-service-latest"
+                //             sh "docker tag cogeex:matching-service-latest ${tag}"
+                //             docker.withRegistry('', DOCKER_CRED_ID) {
+                //                 docker.image(tag).push()
+                //             }
+                //         }
+                //     }
+                // }
                 stage('Push Frontend') {
                     steps {
                         script {
@@ -147,8 +147,7 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${VPS_SSH} << EOF
                             echo "[INFO] Setting up the manifests folder on VPS..."
                             mkdir -p ${VPS_USER_HOME}/manifests
-                            sudo rm -rf /mnt/data/postgresql-db
-                            kubectl delete -f /home/${VPS_USER}/manifests/.
+                            kubectl delete deployment api-gateway auth-service company-service eureka-service frontend-deployment matching-service parser-service postgresql-db profile-service project-service
                             echo "[INFO] Rolling out updated services..."
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-db.yaml
                             kubectl apply -f /home/${VPS_USER}/manifests/cogeex-eureka.yaml
